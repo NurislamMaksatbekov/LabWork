@@ -3,6 +3,11 @@ import com.sun.net.httpserver.HttpExchange;
 import entity.User;
 
 import com.sun.net.httpserver.HttpExchange;
+import dataModel.CandidateDataModel;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 import server.BasicServer;
 import server.ContentType;
 import util.FileService;
@@ -11,6 +16,8 @@ import server.Cookie;
 import util.FileService;
 import util.Utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -18,12 +25,10 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.io.OutputStreamWriter;
 
 public class VoteMachineApp extends BasicServer {
-
-
-    public VoteMachineApp(String host, int port) throws IOException {
-    public VoteMachineApp(String host, int port) throws IOException {
+    protected VoteMachineApp(String host, int port) throws IOException {
         super(host, port);
         registerGet("/register", this::registerModuleGet);
         registerPost("/register", this::registerModulePOST);
@@ -106,5 +111,14 @@ public class VoteMachineApp extends BasicServer {
 
     private void loginGet(HttpExchange exchange) {
         renderTemplate(exchange, "login.ftlh", null);
+        registerGet("/", this::candidatesHandler);
+    }
+
+    private void candidatesHandler(HttpExchange exchange) {
+        renderTemplate(exchange, "candidates.ftlh", getCandidatesDataModel());
+    }
+
+    private CandidateDataModel getCandidatesDataModel() {
+        return new CandidateDataModel();
     }
 }
