@@ -1,0 +1,37 @@
+[
+    {
+      "id": 1,
+      "name": "Иван",
+      "email": "azidin@g",
+      "password": "1",
+      "votes": 0
+    },
+    {
+      "id": 2,
+      "name": "dsvfg",
+      "email": "sfdbg@gmai.com",
+      "password": "cwewec",
+      "votes": 0
+    },
+    {
+      "id": 3,
+      "name": "asdasda",
+      "email": "a@a",
+      "password": "adasd",
+      "votes": 0
+    },
+    {
+      "id": 0,
+      "name": "gbdfvsc",
+      "email": "tatiana.sokolova@company.com",
+      "password": "dfgh",
+      "votes": 0
+    },
+    {
+      "id": 0,
+      "name": "azidin",
+      "email": "amankulov@gmail.com",
+      "password": "120",
+      "votes": 0
+    }
+  ]

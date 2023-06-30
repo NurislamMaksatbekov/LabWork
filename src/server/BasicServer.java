@@ -196,6 +196,17 @@ public abstract class BasicServer {
         }
     }
 
+    protected boolean isUserAuthenticated(HttpExchange exchange) {
+        String cookie = getCookies(exchange);
+        Map<String, String> parse = Cookie.parse(cookie);
+        String emailUser = parse.get("email");
+        return emailUser != null && isValidUser(emailUser);
+    }
+
+    protected boolean isValidUser(String email) {
+        return true;
+    }
+
 
 
     public final void start() {
