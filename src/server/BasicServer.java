@@ -2,11 +2,12 @@ package server;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -18,6 +19,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public abstract class BasicServer {
+
+    private final Configuration freemarker = initFreeMarker();
+
     private final HttpServer server;
     // путь к каталогу с файлами, которые будет отдавать сервер по запросам клиентов
     private final String dataDir = "data";
@@ -26,6 +30,42 @@ public abstract class BasicServer {
     protected BasicServer(String host, int port) throws IOException {
         server = createServer(host, port);
         registerCommonHandlers();
+    }
+
+    private static Configuration initFreeMarker() {
+        try {
+            Configuration cfg = new Configuration(Configuration.VERSION_2_3_29);
+            cfg.setDirectoryForTemplateLoading(new File("data"));
+
+            cfg.setDefaultEncoding("UTF-8");
+            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+            cfg.setLogTemplateExceptions(false);
+            cfg.setWrapUncheckedExceptions(true);
+            cfg.setFallbackOnNullLoopVariable(false);
+            return cfg;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void renderTemplate(HttpExchange exchange, String templateFile, Object dataModel) {
+        try {
+            Template temp = freemarker.getTemplate(templateFile);
+
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            try (OutputStreamWriter writer = new OutputStreamWriter(stream)) {
+
+                temp.process(dataModel, writer);
+                writer.flush();
+
+                var data = stream.toByteArray();
+
+                sendByteData(exchange, ResponseCodes.OK, ContentType.TEXT_HTML, data);
+            }
+        } catch (IOException | TemplateException e) {
+            e.printStackTrace();
+        }
     }
 
     private static String makeKey(String method, String route) {
@@ -62,17 +102,8 @@ public abstract class BasicServer {
     }
 
     private void registerCommonHandlers() {
-        // самый основной обработчик, который будет определять
-        // какие обработчики вызывать в дальнейшем
         server.createContext("/", this::handleIncomingServerRequests);
-        // специфичные обработчики, которые выполняют свои действия
-        // в зависимости от типа запроса
-        // обработчик для корневого запроса
-        // именно этот обработчик отвечает что отображать,
-        // когда пользователь запрашивает localhost:9889
-        registerGet("/", exchange -> sendFile(exchange, makeFilePath("index.html"), ContentType.TEXT_HTML));
-
-        // эти обрабатывают запросы с указанными расширениями
+        registerGet("/", this::indexPage);
         registerFileHandler(".css", ContentType.TEXT_CSS);
         registerFileHandler(".html", ContentType.TEXT_HTML);
         registerFileHandler(".ftlh", ContentType.TEXT_HTML);
@@ -80,6 +111,11 @@ public abstract class BasicServer {
         registerFileHandler(".jpeg", ContentType.IMAGE_JPEG);
         registerFileHandler(".png", ContentType.IMAGE_PNG);
     }
+
+    private void indexPage(HttpExchange exchange) {
+        renderTemplate(exchange, "candidates.ftlh", getCandidatesDataModel());
+    }
+
     protected final void registerGenericHandler(String method, String route, RouteHandler handler) {
         getRoutes().put(makeKey(method, route), handler);
     }
