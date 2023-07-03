@@ -21,10 +21,19 @@ public class VoteMachineApp extends BasicServer {
         this.users.addAll(FileService.readUser());
         registerGet("/", this::candidatesHandler);
         registerGet("/login", this::loginGet);
-//        registerPost("/login", this::loginPost);
+        registerPost("/login", this::loginPost);
         registerGet("/register", this::registerModuleGet);
         registerPost("/register", this::registerModulePost);
         registerGet("/notExists", this::notExists);
+        registerGet("/incorrectLogin", this::errorLogin);
+    }
+
+    private void errorLogin(HttpExchange exchange) {
+        renderTemplate(exchange, "incorrectLogin.ftlh", null);
+    }
+
+    private void candidatesHandler(HttpExchange exchange) {
+        renderTemplate(exchange, "candidates.ftlh", getCandidatesDataModel());
     }
 
     private void registerModuleGet(HttpExchange exchange) {
@@ -43,7 +52,7 @@ public class VoteMachineApp extends BasicServer {
             Optional<User> findUserByEmail = users.stream().filter(u -> u.getEmail().equalsIgnoreCase(email)).findFirst();
             if (findUserByEmail.isPresent() || checkString(name) || checkString(password)) {
                 throw new IOException();
-            }else {
+            } else {
                 int votes = 0;
                 int id = users.size() + 1;
                 User newUser = new User(id, name, email, password, votes);
@@ -51,7 +60,7 @@ public class VoteMachineApp extends BasicServer {
                 FileService.writeFile(users);
                 redirect303(exchange, "/login");
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             redirect303(exchange, "/notExists");
         }
     }
@@ -68,29 +77,14 @@ public class VoteMachineApp extends BasicServer {
     private void loginPost(HttpExchange exchange) {
         String raw = getBody(exchange);
         Map<String, String> parsed = Utils.parseUrlEncoded(raw, "&");
-        try {
-            List<User> userList = FileService.readUser();
-            String mail = parsed.get("email");
-            String password = parsed.get("password");
-            boolean check = false;
-            if (mail.isBlank() || password.isBlank()) {
-                redirect303(exchange, "notLoginExists");
-                return;
-            }
-            for (User user : userList) {
-                if (mail.equals(user.getEmail()) && password.equals(user.getPassword())) {
-                    cookie(exchange, mail);
-                    check = true;
-                    break;
-                }
-            }
-            if (check) {
-                redirect303(exchange,"/register");
-            } else {
-                throw new Exception();
-            }
-        } catch (Exception e) {
-            redirect303(exchange, "notLoginExists");
+        String email = parsed.get("email");
+        String password = parsed.get("password");
+        Optional<User> findUserByEmail = users.stream().filter(u -> u.getEmail().equalsIgnoreCase(email) && u.getPassword().equalsIgnoreCase(password)).findFirst();
+        if (findUserByEmail.isPresent()) {
+            cookie(exchange, email);
+            redirect303(exchange, "/");
+        } else {
+            redirect303(exchange, "/incorrectLogin");
         }
     }
 

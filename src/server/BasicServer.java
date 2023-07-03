@@ -1,5 +1,6 @@
 package server;
 
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import freemarker.template.Configuration;
@@ -177,11 +178,6 @@ public abstract class BasicServer {
         route.handle(exchange);
     }
 
-    public static String getContentType(HttpExchange exchange) {
-        return exchange.getRequestHeaders()
-                .getOrDefault("Content-Type", List.of(""))
-                .get(0);
-    }
 
     protected String getBody(HttpExchange exchange) {
         InputStream input = exchange.getRequestBody();
@@ -209,17 +205,13 @@ public abstract class BasicServer {
                 .getOrDefault("Cookie", List.of(""))
                 .get(0);
     }
-    protected void setCookie(HttpExchange exchange, Cookie cookie){
-        exchange.getResponseHeaders().add("Set-Cookie", cookie.toString());
-    }
 
     protected String getQueryParams(HttpExchange exchange) {
              String query = exchange.getRequestURI().getQuery();
         return Objects.nonNull(query) ? query : "";
     }
-
     private void logout(HttpExchange exchange) throws IOException {
-        deleteCookie(exchange, "mail");
+        deleteCookie(exchange, "email");
         String redirectUrl = "/";
         exchange.getResponseHeaders().set("Location", redirectUrl);
         exchange.sendResponseHeaders(303, -1);

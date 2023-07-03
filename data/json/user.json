@@ -26,5 +26,12 @@
     "email": "kairatalishev1308@gmail.com",
     "password": "a",
     "votes": 0
+  },
+  {
+    "id": 5,
+    "name": "Kairat",
+    "email": "Johny@gmail.com",
+    "password": "123",
+    "votes": 0
   }
 ]
