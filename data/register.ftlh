@@ -7,28 +7,38 @@
 
     <style>
         body {
-            background-image: url("https://c4.wallpaperflare.com/wallpaper/800/182/453/minimalism-humor-simple-background-mummy-wallpaper-preview.jpg");
+            background-image: url(images/wallpaperflare.com_wallpaper.jpg);
             background-size: cover;
-
         }
         .container {
             max-width: 350px;
             margin: 0 auto;
-            margin-top: 100px;
-            background-color: rgba(255, 255, 255, 0.9);
+            margin-top: 16%;
+            background-color: rgba(255, 255, 255, 0.3);
             padding: 20px;
             border-radius: 8px;
         }
         h1 {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 0px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Регистрация</h1>
+    <h1 class="lol">Sign up</h1>
     <form action="/register" method="POST">
         <div class="form-group">
             <div class="form-group">
@@ -42,7 +52,7 @@
             <label for="password">Password:</label>
             <input type="password" class="form-control" id="password" name="password" required>
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
+        <button type="submit" class="btn btn-info btn-block">Зарегистрироваться</button>
     </form>
 </div>
 
