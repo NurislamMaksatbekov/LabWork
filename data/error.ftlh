@@ -20,7 +20,7 @@
     <p><b>Ошибка!</b></p>
     <p>Войдите в аккаунт чтобы проголосвать за кандидата!</p>
     <a href="/login" class="btn btn-outline-success my-2 my-sm-0">LOGIN</a>
-    <p class="description mt-5">Если у вас нет аккаунта вы можете зарегестрироваться по кнопке "REGISTER"</p>
+    <p class="description mt-5">Если у вас нет аккаунта вы можете зарегистрироваться по кнопке "REGISTER"</p>
     <a href="/register" class="btn btn-outline-success my-2 my-sm-0">REGISTER</a>
 </body>
 </html>

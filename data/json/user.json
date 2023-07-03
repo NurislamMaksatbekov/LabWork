@@ -1,4 +1,5 @@
-[
+{
+  "user": [
     {
       "id": 1,
       "name": "Иван",
@@ -33,5 +34,20 @@
       "email": "amankulov@gmail.com",
       "password": "120",
       "votes": 0
+    },
+    {
+      "id": 0,
+      "name": "gbdfvsc",
+      "email": "ctryukjthrgefdw@gmail.ciom",
+      "password": "efwrgtynhg",
+      "votes": 0
+    },
+    {
+      "id": 7,
+      "name": "gbdfvsc",
+      "email": "saSAas@S",
+      "password": "a",
+      "votes": 0
     }
   ]
+}
