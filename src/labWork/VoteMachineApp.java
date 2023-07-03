@@ -32,7 +32,13 @@ public class VoteMachineApp extends BasicServer {
         registerGet("/notExists", this::notExists);
         registerGet("/incorrectLogin", this::errorLogin);
         registerPost("/vote", this::votePost);
+        registerGet("/votes", this::votesGet);
     }
+
+    private void votesGet(HttpExchange exchange) {
+        renderTemplate(exchange, "votes.ftlh", getCandidatesDataModel());
+    }
+
 
     private Optional<Candidate> findCandidateByName(String name) {
         return candidates.stream()
