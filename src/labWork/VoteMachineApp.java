@@ -7,6 +7,7 @@ import entity.User;
 
 import dataModel.CandidatesDataModel;
 import server.BasicServer;
+import server.ResponseCodes;
 import util.FileService;
 import util.Utils;
 
@@ -59,11 +60,19 @@ public class VoteMachineApp extends BasicServer {
             candidate.get().setVotes(candidate.get().getVotes() + 1);
             setTotalVotes(getTotalVotes() + 1);
             candidate.get().setPercent(candidate.get().getVotes() / getTotalVotes() * 100);
+            for (Candidate c : candidates) {
+                if (c.getName().equals(candidate.get().getName())) {
+                    c.setPercent(candidate.get().getPercent());
+                    break;
+                }
+            }
+            FileService.writeCandidates(candidates);
             redirect303(exchange, "/thankYou?name="+name);
         } else {
-            redirect303(exchange, "/errorBook");
+            respond404(exchange);
         }
     }
+
 
 
     private void thankYouGet(HttpExchange exchange) {
@@ -111,7 +120,7 @@ public class VoteMachineApp extends BasicServer {
                 int id = users.size() + 1;
                 User newUser = new User(id, name, email, password, votes);
                 users.add(newUser);
-                FileService.writeFile(users);
+                FileService.writeUsers(users);
                 redirect303(exchange, "/login");
             }
         } catch (IOException e) {
