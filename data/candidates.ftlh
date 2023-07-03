@@ -22,10 +22,11 @@
                 <div class="card">
                     <img src="${candidate.photo}" class="card-img-top" alt="${candidate.name}">
                     <b class="card-text text-center mt-3 mb-3">${candidate.name}</b>
-                    <form action="/vote" method="post" class="flex flex-col align-center" href="#">
-                        <input name="candidateId" type="hidden" value="candidate_id">
+                    <form action="/vote" method="post" class="flex flex-col align-center" href="/thankyou">
+                        <input name="candidateName" type="hidden" value="${candidate.name}">
                         <button type="submit" class="vote flex align-center">Vote</button>
                     </form>
+
                 </div>
             </div>
         </#list>

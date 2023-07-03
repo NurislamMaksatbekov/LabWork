@@ -31,7 +31,30 @@ public class VoteMachineApp extends BasicServer {
         registerPost("/register", this::registerModulePost);
         registerGet("/notExists", this::notExists);
         registerGet("/incorrectLogin", this::errorLogin);
+        registerPost("/vote", this::votePost);
     }
+
+    private Optional<Candidate> findCandidateByName(String name) {
+        return candidates.stream()
+                .filter(e -> e.getName().equalsIgnoreCase(name))
+                .findFirst();
+    }
+    private Map<String, String> getParsedBody(HttpExchange exchange) {
+        return Utils.parseUrlEncoded(getBody(exchange), "&");
+    }
+
+    private void votePost(HttpExchange exchange) {
+        var parsed = getParsedBody(exchange);
+        String name = parsed.get("name");
+
+        Optional<Candidate> candidate = findCandidateByName(name);
+        if (candidate.isPresent()) {
+            redirect303(exchange, "/thankYou?name="+name);
+        } else {
+            redirect303(exchange, "/errorBook");
+        }
+    }
+
 
     private void thankYouGet(HttpExchange exchange) {
         String query = getQueryParams(exchange);
