@@ -4,34 +4,48 @@
     "name": "Kairat",
     "email": "kairatalishev1308@gmail.com",
     "password": "123",
-    "votes": 0
+    "vote": 0
   },
   {
     "id": 2,
     "name": "Kairat",
     "email": "kairatalishev1308@gmail.com",
     "password": "123",
-    "votes": 0
+    "vote": 0
   },
   {
     "id": 3,
     "name": "Kairat",
     "email": "kairatalishev1308@gmail.com",
     "password": "123",
-    "votes": 0
+    "vote": 0
   },
   {
     "id": 4,
     "name": "Kairat",
     "email": "kairatalishev1308@gmail.com",
     "password": "a",
-    "votes": 0
+    "vote": 0
   },
   {
     "id": 5,
     "name": "Kairat",
     "email": "Johny@gmail.com",
     "password": "123",
-    "votes": 0
+    "vote": 0
+  },
+  {
+    "id": 6,
+    "name": "azidin",
+    "email": "azidinamankulov@gmail.com",
+    "password": "qwertyhjk",
+    "vote": 0
+  },
+  {
+    "id": 7,
+    "name": "azidinamankulov@gmail.com",
+    "email": "azidin@1.com",
+    "password": "342",
+    "vote": 0
   }
 ]
