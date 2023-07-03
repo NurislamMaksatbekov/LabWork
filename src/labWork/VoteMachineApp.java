@@ -10,6 +10,8 @@ import util.Utils;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 public class VoteMachineApp extends BasicServer {
     private final List<User> users = Collections.synchronizedList(new ArrayList<>());
@@ -59,38 +61,37 @@ public class VoteMachineApp extends BasicServer {
         renderTemplate(exchange, "notExists.ftlh", null);
     }
 
-//    private void loginPost(HttpExchange exchange) {
-//            String raw = getBody(exchange);
-//            Map<String, String> parsed = Utils.parseUrlEncoded(raw, "&");
-//
-//            String email = parsed.get("email");
-//            String password = parsed.get("password");
-//
-//            if (users.stream().anyMatch(e -> e.getEmail().equals(email) && e.getPassword().equals(password))) {
-//                Map<String, Object> data = new HashMap<>();
-//                cookie = Cookie.make("email", email);
-//
-//                String cookieString = getCookies(exchange);
-//                Map<String, String> cookies = Cookie.parse(cookieString);
-//                cookie.setMaxAge(getMaxAge());
-//                cookie.setHttpOnly(true);
-//
-//                setCookie(exchange, cookie);
-//                data.put("cookies", cookies);
-//
-//                redirect303(exchange, "/profile?email=" + email);
-//            } else {
-//                redirect303(exchange, "/incorrectData");
-//            }
-//    }
-
     private void loginGet(HttpExchange exchange) {
         renderTemplate(exchange, "login.ftlh", null);
-        registerGet("/", this::candidatesHandler);
     }
 
-    private void candidatesHandler(HttpExchange exchange) {
-        renderTemplate(exchange, "candidates.ftlh", getCandidatesDataModel());
+    private void loginPost(HttpExchange exchange) {
+        String raw = getBody(exchange);
+        Map<String, String> parsed = Utils.parseUrlEncoded(raw, "&");
+        try {
+            List<User> userList = FileService.readUser();
+            String mail = parsed.get("email");
+            String password = parsed.get("password");
+            boolean check = false;
+            if (mail.isBlank() || password.isBlank()) {
+                redirect303(exchange, "notLoginExists");
+                return;
+            }
+            for (User user : userList) {
+                if (mail.equals(user.getEmail()) && password.equals(user.getPassword())) {
+                    cookie(exchange, mail);
+                    check = true;
+                    break;
+                }
+            }
+            if (check) {
+                redirect303(exchange,"/register");
+            } else {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            redirect303(exchange, "notLoginExists");
+        }
     }
 
     private CandidateDataModel getCandidatesDataModel() {

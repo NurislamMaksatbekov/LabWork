@@ -218,15 +218,18 @@ public abstract class BasicServer {
         return Objects.nonNull(query) ? query : "";
     }
 
-    protected void logout(HttpExchange exchange) {
-        String cookieString = exchange.getRequestHeaders().getFirst("Cookie");
-        if (cookieString != null) {
-            Map<String, String> cookies = Cookie.parse(cookieString);
-            if (cookies.containsKey("email")) {
-                String expiredCookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                exchange.getResponseHeaders().add("Set-Cookie", expiredCookie);
-            }
-        }
+    private void logout(HttpExchange exchange) throws IOException {
+        deleteCookie(exchange, "mail");
+        String redirectUrl = "/";
+        exchange.getResponseHeaders().set("Location", redirectUrl);
+        exchange.sendResponseHeaders(303, -1);
+        exchange.close();
+    }
+
+    private void deleteCookie(HttpExchange exchange, String cookieName) {
+        Headers responseHeaders = exchange.getResponseHeaders();
+        String cookieHeader = String.format("%s=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT", cookieName);
+        responseHeaders.add("Set-Cookie", cookieHeader);
     }
 
     protected boolean isUserAuthenticated(HttpExchange exchange) {
@@ -243,6 +246,23 @@ public abstract class BasicServer {
 protected boolean checkString (String str){
         return str.isBlank() || str.isEmpty();
 }
+
+    protected  void cookie(HttpExchange exchange,String mail){
+        try {
+            Cookie cookies = Cookie.make("mail",mail);
+            cookies.setMaxAge(6000);
+            cookies.setHttpOnly(true);
+            Map<String,Object> object = new HashMap<>();
+            String cookie = getCookies(exchange);
+            Map<String,String> parse = Cookie.parse(cookie);
+            object.put(parse.toString(),mail);
+            exchange.getResponseHeaders().add("Set-Cookie", cookies.toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
 
     public final void start() {
         server.start();
