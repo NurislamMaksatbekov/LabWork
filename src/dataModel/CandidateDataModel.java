@@ -1,22 +1,21 @@
 package dataModel;
 
 import entity.Candidate;
-import util.FileService;
 
-import java.util.List;
+import java.util.Optional;
 
 public class CandidateDataModel {
-    List<Candidate> candidates;
+    private Optional <Candidate> candidate;
 
-    public CandidateDataModel() {
-        this.candidates = FileService.readCandidatesFile();
+    public CandidateDataModel(Optional<Candidate> candidate) {
+        this.candidate = candidate;
     }
 
-    public List<Candidate> getCandidates() {
-        return candidates;
+    public Optional<Candidate> getCandidate() {
+        return candidate;
     }
 
-    public void setCandidates(List<Candidate> candidates) {
-        this.candidates = candidates;
+    public void setCandidate(Optional<Candidate> candidate) {
+        this.candidate = candidate;
     }
 }

@@ -1,9 +1,11 @@
 package labWork;
 
 import com.sun.net.httpserver.HttpExchange;
+import dataModel.CandidateDataModel;
+import entity.Candidate;
 import entity.User;
 
-import dataModel.CandidateDataModel;
+import dataModel.CandidatesDataModel;
 import server.BasicServer;
 import util.FileService;
 import util.Utils;
@@ -15,17 +17,34 @@ import java.util.Map;
 
 public class VoteMachineApp extends BasicServer {
     private final List<User> users = Collections.synchronizedList(new ArrayList<>());
+    private final List<Candidate> candidates = Collections.synchronizedList(new ArrayList<>());
 
     public VoteMachineApp(String host, int port) throws IOException {
         super(host, port);
         this.users.addAll(FileService.readUser());
+        this.candidates.addAll(FileService.readCandidatesFile());
         registerGet("/", this::candidatesHandler);
+        registerGet("/thankYou", this::thankYouGet);
         registerGet("/login", this::loginGet);
         registerPost("/login", this::loginPost);
         registerGet("/register", this::registerModuleGet);
         registerPost("/register", this::registerModulePost);
         registerGet("/notExists", this::notExists);
         registerGet("/incorrectLogin", this::errorLogin);
+    }
+
+    private void thankYouGet(HttpExchange exchange) {
+        String query = getQueryParams(exchange);
+        Map<String, String> params = Utils.parseUrlEncoded(query, "&");
+        String name = params.getOrDefault("name", null);
+        renderTemplate(exchange, "thankyou.ftlh", getCandidateDataModel(name));
+    }
+
+    private CandidateDataModel getCandidateDataModel(String name) {
+        Optional<Candidate> candidate = candidates.stream()
+                .filter(c -> c.getName().equals(name))
+                .findFirst();
+        return new CandidateDataModel(candidate);
     }
 
     private void errorLogin(HttpExchange exchange) {
@@ -88,8 +107,8 @@ public class VoteMachineApp extends BasicServer {
         }
     }
 
-    private CandidateDataModel getCandidatesDataModel() {
-        return new CandidateDataModel();
+    private CandidatesDataModel getCandidatesDataModel() {
+        return new CandidatesDataModel();
     }
 
 }
