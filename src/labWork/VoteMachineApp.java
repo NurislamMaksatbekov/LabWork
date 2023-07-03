@@ -1,6 +1,7 @@
 package labWork;
 
 import com.sun.net.httpserver.HttpExchange;
+import entity.Candidate;
 import entity.User;
 
 import dataModel.CandidateDataModel;
@@ -15,10 +16,13 @@ import java.util.Map;
 
 public class VoteMachineApp extends BasicServer {
     private final List<User> users = Collections.synchronizedList(new ArrayList<>());
+    private final List<Candidate> candidates = Collections.synchronizedList(new ArrayList<>());
+
 
     public VoteMachineApp(String host, int port) throws IOException {
         super(host, port);
         this.users.addAll(FileService.readUser());
+        this.candidates.addAll(FileService.readCandidatesFile());
         registerGet("/", this::candidatesHandler);
         registerGet("/login", this::loginGet);
         registerPost("/login", this::loginPost);
@@ -26,7 +30,30 @@ public class VoteMachineApp extends BasicServer {
         registerPost("/register", this::registerModulePost);
         registerGet("/notExists", this::notExists);
         registerGet("/incorrectLogin", this::errorLogin);
+        registerPost("/vote", this::votePost);
     }
+
+    private Optional<Candidate> findCandidateByName(String name) {
+        return candidates.stream()
+                .filter(e -> e.getName().equalsIgnoreCase(name))
+                .findFirst();
+    }
+    private Map<String, String> getParsedBody(HttpExchange exchange) {
+        return Utils.parseUrlEncoded(getBody(exchange), "&");
+    }
+
+    private void votePost(HttpExchange exchange) {
+        var parsed = getParsedBody(exchange);
+        String name = parsed.get("name");
+
+        Optional<Candidate> candidate = findCandidateByName(name);
+        if (candidate.isPresent()) {
+            redirect303(exchange, "/thankYou?name="+name);
+        } else {
+            redirect303(exchange, "/errorBook");
+        }
+    }
+
 
     private void errorLogin(HttpExchange exchange) {
         renderTemplate(exchange, "incorrectLogin.ftlh", null);
