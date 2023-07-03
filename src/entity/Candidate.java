@@ -4,10 +4,19 @@ public class Candidate {
     private String name;
     private String photo;
 
+    private int votes;
 
-    public Candidate(String name,String photo) {
+
+    public Candidate(String name, String photo) {
         this.name = name;
         this.photo = photo;
+    }
+    public int getVotes() {
+        return votes;
+    }
+
+    public void setVotes(int votes) {
+        this.votes = votes;
     }
 
     public String getPhoto() {

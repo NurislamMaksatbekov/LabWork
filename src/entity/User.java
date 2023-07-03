@@ -1,7 +1,5 @@
 package entity;
 
-import java.util.Objects;
-
 public class User {
 
     private int id;
@@ -12,15 +10,15 @@ public class User {
 
     private String password;
 
-    private int votes;
+    private int vote;
 
 
-    public User(int id, String name, String email, String password, int votes) {
+    public User(int id, String name, String email, String password, int vote) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.votes = votes;
+        this.vote = vote;
     }
 
     public int getId() {
@@ -55,25 +53,15 @@ public class User {
         this.password = password;
     }
 
-    public int getVotes() {
-        return votes;
+    public int getVote() {
+        return vote;
     }
 
-    public void setVotes(int votes) {
-        if (votes > 1) {
+    public void setVote(int vote) {
+        if (vote > 1) {
             throw new IllegalArgumentException("you can't votes more than 1.");
         }
-        this.votes = votes;
+        this.vote = vote;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", votes=" + votes +
-                '}';
-    }
 }
