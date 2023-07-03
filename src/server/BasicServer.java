@@ -103,7 +103,6 @@ public abstract class BasicServer {
 
     private void registerCommonHandlers() {
         server.createContext("/", this::handleIncomingServerRequests);
-        registerGet("/", this::indexPage);
         registerFileHandler(".css", ContentType.TEXT_CSS);
         registerFileHandler(".html", ContentType.TEXT_HTML);
         registerFileHandler(".ftlh", ContentType.TEXT_HTML);
@@ -112,9 +111,7 @@ public abstract class BasicServer {
         registerFileHandler(".png", ContentType.IMAGE_PNG);
     }
 
-    private void indexPage(HttpExchange exchange) {
-        renderTemplate(exchange, "candidates.ftlh", getCandidatesDataModel());
-    }
+
 
     protected final void registerGenericHandler(String method, String route, RouteHandler handler) {
         getRoutes().put(makeKey(method, route), handler);
@@ -243,7 +240,9 @@ public abstract class BasicServer {
         return true;
     }
 
-
+protected boolean checkString (String str){
+        return str.isBlank() || str.isEmpty();
+}
 
     public final void start() {
         server.start();

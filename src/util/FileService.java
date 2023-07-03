@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import entity.Candidate;
+import entity.User;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -17,27 +18,33 @@ import java.util.Map;
 
 public class FileService {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path PATH = Paths.get("data/json/candidates.json");
+    private static final Path PATHC = Paths.get("data/json/candidates.json");
+    private static final Path PATHU = Paths.get("data/json/user.json");
 
 
-//    public static List<User> readUser() {
-//        Type type = new TypeToken<Map<String,List<User>>>(){}.getType();
-//
-//        try(Reader reader = new FileReader(user)) {
-//            Map<String, List<User>> emplMap = GSON.fromJson(reader,type);
-//            return emplMap.get("user");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return List.of();
-//        }
-//    }
+    public static void writeFile(List<User> employeeList){
+        String str = GSON.toJson(employeeList);
+        try {
+            byte[] strToBytes = str.getBytes();
+            Files.write(PATHU, strToBytes);
+        }catch (IOException e){
+            e.printStackTrace();        }
+    }
 public static List<Candidate> readCandidatesFile(){
     String json = "";
     try {
-        json = Files.readString(PATH);
+        json = Files.readString(PATHC);
     }catch (IOException e){
         e.printStackTrace();
     }        return GSON.fromJson(json, new TypeToken<List<Candidate>>() {}.getType());
 }
+    public static List<User> readUser(){
+        String json = "";
+        try {
+            json = Files.readString(PATHU);
+        }catch (IOException e){
+            e.printStackTrace();
+        }        return GSON.fromJson(json, new TypeToken<List<User>>() {}.getType());
+    }
 
 }

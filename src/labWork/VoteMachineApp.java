@@ -1,113 +1,88 @@
 package labWork;
+
 import com.sun.net.httpserver.HttpExchange;
 import entity.User;
 
-import com.sun.net.httpserver.HttpExchange;
 import dataModel.CandidateDataModel;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import freemarker.template.TemplateExceptionHandler;
 import server.BasicServer;
-import server.ContentType;
-import util.FileService;
-import util.Utils;
-import server.Cookie;
 import util.FileService;
 import util.Utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.io.OutputStreamWriter;
+import java.util.*;
 
 public class VoteMachineApp extends BasicServer {
-    protected VoteMachineApp(String host, int port) throws IOException {
+    private final List<User> users = Collections.synchronizedList(new ArrayList<>());
+
+    public VoteMachineApp(String host, int port) throws IOException {
         super(host, port);
+        this.users.addAll(FileService.readUser());
+        registerGet("/", this::candidatesHandler);
+        registerGet("/login", this::loginGet);
+//        registerPost("/login", this::loginPost);
         registerGet("/register", this::registerModuleGet);
-        registerPost("/register", this::registerModulePOST);
+        registerPost("/register", this::registerModulePost);
         registerGet("/notExists", this::notExists);
     }
 
     private void registerModuleGet(HttpExchange exchange) {
-
+        renderTemplate(exchange, "register.ftlh", null);
     }
 
 
-    private void registerModulePOST(HttpExchange exchange) {
-        List<User> user = FileService.readUser();
+    private void registerModulePost(HttpExchange exchange) {
         String raw = getBody(exchange);
         Map<String, String> parsed = Utils.parseUrlEncoded(raw, "&");
         try {
             String name = parsed.get("name");
-            String mail = parsed.get("email");
+            String email = parsed.get("email");
             String password = parsed.get("password");
 
-            if (name.isBlank() || mail.isBlank() || password.isBlank()) {
-                redirect303(exchange, "notExists");
-                return;
-            }
-            boolean check = true;
-            for (User employee : user) {
-                if (mail.equals(employee.getEmail())) {
-                    check = false;
-                    break;
-                }
-            }
-            if (check) {
-                int votes= 0;
-                int id = 0;
-
-                User newUser = new User(0,name, mail, password, votes);
-                user.add(newUser);
-                FileService.writeFile(user);
+            Optional<User> findUserByEmail = users.stream().filter(u -> u.getEmail().equalsIgnoreCase(email)).findFirst();
+            if (findUserByEmail.isPresent() || checkString(name) || checkString(password)) {
+                throw new IOException();
+            }else {
+                int votes = 0;
+                int id = users.size() + 1;
+                User newUser = new User(id, name, email, password, votes);
+                users.add(newUser);
+                FileService.writeFile(users);
                 redirect303(exchange, "/login");
-            } else {
-                throw new Exception();
             }
-        } catch (Exception e) {
+        }catch (IOException e){
             redirect303(exchange, "/notExists");
         }
     }
 
 
-
     private void notExists(HttpExchange exchange) {
-
-        registerGet("/login", this::loginGet);
-        registerPost("/login", this::loginPost);
+        renderTemplate(exchange, "notExists.ftlh", null);
     }
 
-    private void loginPost(HttpExchange exchange) {
-            String raw = getBody(exchange);
-            Map<String, String> parsed = Utils.parseUrlEncoded(raw, "&");
-
-            String email = parsed.get("email");
-            String password = parsed.get("password");
-
-            if (user.stream().anyMatch(e -> e.getEmail().equals(email) && e.getPassword().equals(password))) {
-                Map<String, Object> data = new HashMap<>();
-                cookie = Cookie.make("email", email);
-
-                String cookieString = getCookies(exchange);
-                Map<String, String> cookies = Cookie.parse(cookieString);
-                cookie.setMaxAge(getMaxAge());
-                cookie.setHttpOnly(true);
-
-                setCookie(exchange, cookie);
-                data.put("cookies", cookies);
-
-                redirect303(exchange, "/profile?email=" + email);
-            } else {
-                redirect303(exchange, "/incorrectData");
-            }
-    }
+//    private void loginPost(HttpExchange exchange) {
+//            String raw = getBody(exchange);
+//            Map<String, String> parsed = Utils.parseUrlEncoded(raw, "&");
+//
+//            String email = parsed.get("email");
+//            String password = parsed.get("password");
+//
+//            if (users.stream().anyMatch(e -> e.getEmail().equals(email) && e.getPassword().equals(password))) {
+//                Map<String, Object> data = new HashMap<>();
+//                cookie = Cookie.make("email", email);
+//
+//                String cookieString = getCookies(exchange);
+//                Map<String, String> cookies = Cookie.parse(cookieString);
+//                cookie.setMaxAge(getMaxAge());
+//                cookie.setHttpOnly(true);
+//
+//                setCookie(exchange, cookie);
+//                data.put("cookies", cookies);
+//
+//                redirect303(exchange, "/profile?email=" + email);
+//            } else {
+//                redirect303(exchange, "/incorrectData");
+//            }
+//    }
 
     private void loginGet(HttpExchange exchange) {
         renderTemplate(exchange, "login.ftlh", null);
@@ -121,4 +96,5 @@ public class VoteMachineApp extends BasicServer {
     private CandidateDataModel getCandidatesDataModel() {
         return new CandidateDataModel();
     }
+
 }
