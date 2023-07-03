@@ -4,17 +4,23 @@ public class Candidate {
     private String name;
     private String photo;
     private int votes;
-    private double procent;
+    private double percent;
 
 
     public Candidate(String name, String photo, int votes,double procent) {
         this.name = name;
         this.photo = photo;
         this.votes = votes;
-        this.procent = procent;
+        this.percent = procent;
     }
 
+    public double getPercent() {
+        return percent;
+    }
 
+    public void setPercent(double percent) {
+        this.percent = percent;
+    }
 
     public int getVotes() {
         return votes;

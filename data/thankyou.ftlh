@@ -9,11 +9,11 @@
 
 <body>
     <div class="container flex flex-col align-center">
-    <h1>Thank you for your vote!</h1>
+    <h1> ${candidate.name} Thank you for your vote!</h1>
     <main class="flex flex-wrap align-center">
     <div class="card">
       <div class="flex flex-col align-center" href="#">
-        <img src="images/1.jpeg">
+          <img src="${candidate.photo}" class="card-img-top" alt="${candidate.name}">
         <p>Thank you for your vote!</p>
       </div>
     </div>

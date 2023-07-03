@@ -37,7 +37,7 @@ public class VoteMachineApp extends BasicServer {
     private Optional<Candidate> findCandidateByName(String name) {
         return candidates.stream()
                 .filter(e -> e.getName().equalsIgnoreCase(name))
-                .findFirst();
+                .findAny();
     }
     private Map<String, String> getParsedBody(HttpExchange exchange) {
         return Utils.parseUrlEncoded(getBody(exchange), "&");
@@ -65,8 +65,8 @@ public class VoteMachineApp extends BasicServer {
 
     private CandidateDataModel getCandidateDataModel(String name) {
         Optional<Candidate> candidate = candidates.stream()
-                .filter(c -> c.getName().equals(name))
-                .findFirst();
+                .filter(c -> c.getName().equalsIgnoreCase(name))
+                .findAny();
         return new CandidateDataModel(candidate);
     }
 
