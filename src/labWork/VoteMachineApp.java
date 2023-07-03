@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 public class VoteMachineApp extends BasicServer {
+    private double totalVotes;
     private final List<User> users = Collections.synchronizedList(new ArrayList<>());
     private final List<Candidate> candidates = Collections.synchronizedList(new ArrayList<>());
 
@@ -49,6 +50,9 @@ public class VoteMachineApp extends BasicServer {
 
         Optional<Candidate> candidate = findCandidateByName(name);
         if (candidate.isPresent()) {
+            candidate.get().setVotes(candidate.get().getVotes() + 1);
+            setTotalVotes(getTotalVotes() + 1);
+            candidate.get().setPercent(candidate.get().getVotes() / getTotalVotes() * 100);
             redirect303(exchange, "/thankYou?name="+name);
         } else {
             redirect303(exchange, "/errorBook");
@@ -136,4 +140,11 @@ public class VoteMachineApp extends BasicServer {
         return new CandidatesDataModel();
     }
 
+    public double getTotalVotes() {
+        return totalVotes;
+    }
+
+    public void setTotalVotes(double totalVotes) {
+        this.totalVotes = totalVotes;
+    }
 }
