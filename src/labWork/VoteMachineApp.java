@@ -63,11 +63,13 @@ public class VoteMachineApp extends BasicServer {
         renderTemplate(exchange, "thankyou.ftlh", getCandidateDataModel(name));
     }
 
-    private CandidateDataModel getCandidateDataModel(String name) {
-        Optional<Candidate> candidate = candidates.stream()
-                .filter(c -> c.getName().equalsIgnoreCase(name))
-                .findAny();
-        return new CandidateDataModel(candidate);
+    public CandidateDataModel getCandidateDataModel(String name) {
+        for (Candidate candidate : candidates) {
+            if (candidate.getName().equalsIgnoreCase(name)) {
+                return new CandidateDataModel(candidate);
+            }
+        }
+        return null;
     }
 
     private void errorLogin(HttpExchange exchange) {

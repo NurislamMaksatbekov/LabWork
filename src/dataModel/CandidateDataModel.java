@@ -2,20 +2,24 @@ package dataModel;
 
 import entity.Candidate;
 
-import java.util.Optional;
 
 public class CandidateDataModel {
-    private Optional <Candidate> candidate;
+    private Candidate candidate;
 
-    public CandidateDataModel(Optional<Candidate> candidate) {
+    public CandidateDataModel(Candidate candidate) {
         this.candidate = candidate;
     }
 
-    public Optional<Candidate> getCandidate() {
+    public Candidate getCandidate() {
         return candidate;
     }
 
-    public void setCandidate(Optional<Candidate> candidate) {
+    public void setCandidate(Candidate candidate) {
         this.candidate = candidate;
     }
 }
+
+
+
+
+
