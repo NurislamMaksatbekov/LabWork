@@ -47,5 +47,12 @@
     "email": "azidin@1.com",
     "password": "342",
     "vote": 0
+  },
+  {
+    "id": 8,
+    "name": "Nurislam",
+    "email": "maksatbekov@a",
+    "password": "a",
+    "vote": 0
   }
 ]

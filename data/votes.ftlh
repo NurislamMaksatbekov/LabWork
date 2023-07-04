@@ -34,7 +34,7 @@
                 </div>
             </#if>
         </#list>
-        <a class="back flex align-center" href="/candidates">back to main</a>
+        <a class="back flex align-center" href="/">back to main</a>
     </main>
 </div>
 </body>

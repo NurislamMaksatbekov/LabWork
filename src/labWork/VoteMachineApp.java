@@ -68,8 +68,7 @@ public class VoteMachineApp extends BasicServer {
                 candidate.get().setPercent(temporaryPercent);
                 for (Candidate c : candidates) {
                     if (c.getName().equals(candidate.get().getName())) {
-                        c.setVotes(c.getVotes() + 1);
-                        c.setPercent(temporaryPercent);
+                        c.setPercent(candidate.get().getPercent());
                         break;
                     }
                 }
