@@ -16,7 +16,6 @@ public class VoteMachineApp extends BasicServer {
     private double totalVotes;
     private final List<User> users = Collections.synchronizedList(new ArrayList<>());
     private final List<Candidate> candidates = Collections.synchronizedList(new ArrayList<>());
-    private Map<Candidate,Double> candidatesVotes = new HashMap<>();
 
     public VoteMachineApp(String host, int port) throws IOException {
         super(host, port);
@@ -68,7 +67,6 @@ public class VoteMachineApp extends BasicServer {
                 candidate.get().setPercent(temporaryPercent);
                 for (Candidate c : candidates) {
                     if (c.getName().equals(candidate.get().getName())) {
-                        candidatesVotes.put(c,c.getPercent());
                         c.setVotes(c.getVotes() + 1);
                         c.setPercent(temporaryPercent);
                         break;
