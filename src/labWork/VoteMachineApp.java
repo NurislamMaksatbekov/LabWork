@@ -169,10 +169,4 @@ public class VoteMachineApp extends BasicServer {
     public void setTotalVotes(double totalVotes) {
         this.totalVotes = totalVotes;
     }
-
-
-
-    public Map<Candidate, Double> getCandidatesVotes() {
-        return candidatesVotes;
-    }
 }
