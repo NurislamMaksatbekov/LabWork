@@ -8,7 +8,7 @@ public class Candidate {
     private double percent;
 
 
-    public Candidate(String name, String photo, int votes,double percent) {
+    public Candidate(String name, String photo, int votes, double percent) {
         this.name = name;
         this.photo = photo;
         this.votes = votes;

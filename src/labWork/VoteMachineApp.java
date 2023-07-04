@@ -1,4 +1,5 @@
 package labWork;
+
 import com.sun.net.httpserver.HttpExchange;
 import dataModel.CandidateDataModel;
 import entity.Candidate;
@@ -86,16 +87,16 @@ public class VoteMachineApp extends BasicServer {
         String query = getQueryParams(exchange);
         Map<String, String> params = Utils.parseUrlEncoded(query, "&");
         String name = params.getOrDefault("name", null);
-        renderTemplate(exchange, "thankyou.ftlh", getCandidateDataModel(name));
+
+        Optional<Candidate> candidate = findCandidateByName(name);
+        if (candidate.isEmpty()) {
+            respond404(exchange);
+        }
+        renderTemplate(exchange, "thankyou.ftlh", getCandidateDataModel(candidate.get()));
     }
 
-    public CandidateDataModel getCandidateDataModel(String name) {
-        for (Candidate candidate : candidates) {
-            if (candidate.getName().equalsIgnoreCase(name)) {
-                return new CandidateDataModel(candidate);
-            }
-        }
-        return null;
+    public CandidateDataModel getCandidateDataModel(Candidate candidate) {
+        return new CandidateDataModel(candidate);
     }
 
     private void errorLogin(HttpExchange exchange) {
