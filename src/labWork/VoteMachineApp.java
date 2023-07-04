@@ -1,16 +1,12 @@
 package labWork;
-
 import com.sun.net.httpserver.HttpExchange;
 import dataModel.CandidateDataModel;
 import entity.Candidate;
 import entity.User;
-
 import dataModel.CandidatesDataModel;
 import server.BasicServer;
-import server.ResponseCodes;
 import util.FileService;
 import util.Utils;
-
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -20,6 +16,7 @@ public class VoteMachineApp extends BasicServer {
     private double totalVotes;
     private final List<User> users = Collections.synchronizedList(new ArrayList<>());
     private final List<Candidate> candidates = Collections.synchronizedList(new ArrayList<>());
+    private Map<Candidate,Double> candidatesVotes = new HashMap<>();
 
     public VoteMachineApp(String host, int port) throws IOException {
         super(host, port);
@@ -35,7 +32,13 @@ public class VoteMachineApp extends BasicServer {
         registerGet("/incorrectLogin", this::errorLogin);
         registerPost("/vote", this::votePost);
         registerGet("/votes", this::votesGet);
+        registerGet("/dontCookie", this::descriptionOfVotes);
     }
+
+    private void descriptionOfVotes(HttpExchange exchange) {
+        renderTemplate(exchange, "check.ftlh", null);
+    }
+
 
     private void votesGet(HttpExchange exchange) {
         renderTemplate(exchange, "votes.ftlh", getCandidatesDataModel());
@@ -47,32 +50,38 @@ public class VoteMachineApp extends BasicServer {
                 .filter(e -> e.getName().equalsIgnoreCase(name))
                 .findAny();
     }
-    private Map<String, String> getParsedBody(HttpExchange exchange) {
-        return Utils.parseUrlEncoded(getBody(exchange), "&");
-    }
+
 
     private void votePost(HttpExchange exchange) {
-        var parsed = getParsedBody(exchange);
-        String name = parsed.get("name");
-
-        Optional<Candidate> candidate = findCandidateByName(name);
-        if (candidate.isPresent()) {
-            candidate.get().setVotes(candidate.get().getVotes() + 1);
-            setTotalVotes(getTotalVotes() + 1);
-            candidate.get().setPercent(candidate.get().getVotes() / getTotalVotes() * 100);
-            for (Candidate c : candidates) {
-                if (c.getName().equals(candidate.get().getName())) {
-                    c.setPercent(candidate.get().getPercent());
-                    break;
+        if (!isUserAuthenticated(exchange)) {
+            redirect303(exchange, "/dontCookie");
+            return;
+        }
+        try {
+            var parsed = Utils.parseUrlEncoded(getBody(exchange), "&");
+            String name = parsed.get("name");
+            Optional<Candidate> candidate = findCandidateByName(name);
+            if (candidate.isPresent()) {
+                candidate.get().setVotes(candidate.get().getVotes() + 1);
+                setTotalVotes(getTotalVotes() + 1);
+                double temporaryPercent = candidate.get().getVotes() / getTotalVotes() * 100;
+                candidate.get().setPercent(temporaryPercent);
+                for (Candidate c : candidates) {
+                    if (c.getName().equals(candidate.get().getName())) {
+                        candidatesVotes.put(c,c.getPercent());
+                        c.setVotes(c.getVotes() + 1);
+                        c.setPercent(temporaryPercent);
+                        break;
+                    }
                 }
+                redirect303(exchange, "/thankYou?name=" + name);
+            } else {
+                respond404(exchange);
             }
-            FileService.writeCandidates(candidates);
-            redirect303(exchange, "/thankYou?name="+name);
-        } else {
-            respond404(exchange);
+        } catch (NoSuchElementException e) {
+            e.printStackTrace();
         }
     }
-
 
 
     private void thankYouGet(HttpExchange exchange) {
@@ -161,5 +170,11 @@ public class VoteMachineApp extends BasicServer {
 
     public void setTotalVotes(double totalVotes) {
         this.totalVotes = totalVotes;
+    }
+
+
+
+    public Map<Candidate, Double> getCandidatesVotes() {
+        return candidatesVotes;
     }
 }

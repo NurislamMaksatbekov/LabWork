@@ -1,12 +1,15 @@
 package entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Candidate {
+
+    private Map<Candidate,Double> candidateDoubleMap = new HashMap<>();
     private String name;
     private String photo;
     private int votes;
     private double percent;
-
-
 
 
     public Candidate(String name, String photo, int votes,double percent) {

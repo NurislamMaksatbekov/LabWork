@@ -241,7 +241,7 @@ protected boolean checkString (String str){
 
     protected  void cookie(HttpExchange exchange,String mail){
         try {
-            Cookie cookies = Cookie.make("mail",mail);
+            Cookie cookies = Cookie.make("email",mail);
             cookies.setMaxAge(6000);
             cookies.setHttpOnly(true);
             Map<String,Object> object = new HashMap<>();

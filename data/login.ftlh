@@ -7,7 +7,7 @@
 
     <style>
         body {
-            background-image: url("https://c4.wallpaperflare.com/wallpaper/800/182/453/minimalism-humor-simple-background-mummy-wallpaper-preview.jpg");
+            background-image: url(images/back.png);
             background-size: cover;
 
         }
