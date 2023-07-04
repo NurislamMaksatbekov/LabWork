@@ -7,7 +7,6 @@ import entity.User;
 
 import dataModel.CandidatesDataModel;
 import server.BasicServer;
-import server.ResponseCodes;
 import util.FileService;
 import util.Utils;
 
@@ -47,6 +46,7 @@ public class VoteMachineApp extends BasicServer {
                 .filter(e -> e.getName().equalsIgnoreCase(name))
                 .findAny();
     }
+
     private Map<String, String> getParsedBody(HttpExchange exchange) {
         return Utils.parseUrlEncoded(getBody(exchange), "&");
     }
@@ -66,29 +66,26 @@ public class VoteMachineApp extends BasicServer {
                     break;
                 }
             }
-            FileService.writeCandidates(candidates);
-            redirect303(exchange, "/thankYou?name="+name);
+            redirect303(exchange, "/thankYou?name=" + name);
         } else {
             respond404(exchange);
         }
     }
 
-
-
     private void thankYouGet(HttpExchange exchange) {
         String query = getQueryParams(exchange);
         Map<String, String> params = Utils.parseUrlEncoded(query, "&");
         String name = params.getOrDefault("name", null);
-        renderTemplate(exchange, "thankyou.ftlh", getCandidateDataModel(name));
+
+        Optional<Candidate> candidate = findCandidateByName(name);
+        if (candidate.isEmpty()) {
+            respond404(exchange);
+        }
+        renderTemplate(exchange, "thankyou.ftlh", getCandidateDataModel(candidate.get()));
     }
 
-    public CandidateDataModel getCandidateDataModel(String name) {
-        for (Candidate candidate : candidates) {
-            if (candidate.getName().equalsIgnoreCase(name)) {
-                return new CandidateDataModel(candidate);
-            }
-        }
-        return null;
+    public CandidateDataModel getCandidateDataModel(Candidate candidate) {
+        return new CandidateDataModel(candidate);
     }
 
     private void errorLogin(HttpExchange exchange) {
